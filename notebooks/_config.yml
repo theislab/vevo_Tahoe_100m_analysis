@@ -1,0 +1,9 @@
+title: Vevo Tahoe-100m data analysis
+author: Weixu Wang, Ilan Gold
+execute:
+    execute_notebooks: "off"
+
+repository:
+    url: https://github.com/theislab/vevo_Tahoe_100m_analysis
+html:
+    use_repository_button: true
