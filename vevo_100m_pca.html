@@ -1,0 +1,1923 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Out-of-core Analysis &#8212; Vevo Tahoe-100m data analysis</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=eba8b062" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'vevo_100m_pca';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tahoe-100M single cell perturbation atlas data analysis" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Vevo Tahoe-100m data analysis</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="index.html">
+                    Tahoe-100M single cell perturbation atlas data analysis
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Analysis Tahoe-100m datasets with scanpy and RAPIDS</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Out-of-core Analysis</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+<a href="https://github.com/theislab/vevo_Tahoe_100m_analysis" target="_blank"
+   class="btn btn-sm btn-source-repository-button"
+   title="Source repository"
+   data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/vevo_100m_pca.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Out-of-core Analysis</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-notes">Technical Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#merge-all-data-into-giant-file">Merge all data into giant file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-cell-embeddings">Calculate cell embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="out-of-core-analysis">
+<h1>Out-of-core Analysis<a class="headerlink" href="#out-of-core-analysis" title="Link to this heading">#</a></h1>
+<p>With the ever-growing size of datasets, being able to operate on larger-than-memory data is every important.  Both <a class="reference external" href="https://scanpy.readthedocs.io/en/stable/"><code class="docutils literal notranslate"><span class="pre">scanpy</span></code></a> (CPU) and <a class="reference external" href="https://rapids-singlecell.readthedocs.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">rapids_singlecell</span></code></a> (GPU) support full out-of-core, parallelizable analysis steps.  The <a class="reference external" href="https://anndata.readthedocs.io/en/latest/generated/anndata.experimental.read_elem_as_dask.html"><code class="docutils literal notranslate"><span class="pre">ad.experimental.read_elem_as_dask</span></code></a> enables users to lazily load numeric matrix elements of the <code class="docutils literal notranslate"><span class="pre">AnnData</span></code>, such as <code class="docutils literal notranslate"><span class="pre">X</span></code> or <code class="docutils literal notranslate"><span class="pre">obsm[&quot;X_pca&quot;]</span></code>.   In this notebook, we’ll generate a PCA on an 100,000,000 cells from various cell lines with different treatments before visualizing a subset of the data.  Downstream tasks could include anything from deep-learning to a linear classifier.</p>
+<p>For individual tutorials, see <a class="reference external" href="https://rapids-singlecell.readthedocs.io/en/latest/notebooks/multi_gpu_show.html">here</a> for rapids-singlecell and <a class="reference external" href="https://scanpy.readthedocs.io/en/stable/tutorials/experimental/dask.html">here</a> for scanpy</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scanpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">h5py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dask.distributed</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span><span class="p">,</span> <span class="n">LocalCluster</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">dask</span>
+
+<span class="n">sc</span><span class="o">.</span><span class="n">logging</span><span class="o">.</span><span class="n">print_header</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/icb/weixu.wang/miniconda3/envs/rapids_singlecell/lib/python3.12/site-packages/session_info2/__init__.py:124: UserWarning: The &#39;__version__&#39; attribute is deprecated and will be removed in MarkupSafe 3.1. Use feature detection, or `importlib.metadata.version(&quot;markupsafe&quot;)`, instead.
+  and (v := getattr(pkg, &quot;__version__&quot;, None))
+/tmp/ipykernel_632503/582836007.py:19: RuntimeWarning: Failed to import dependencies for application/vnd.jupyter.widget-view+json representation. (ModuleNotFoundError: No module named &#39;ipywidgets&#39;)
+  sc.logging.print_header()
+</pre></div>
+</div>
+<div class="output text_html"><table class=table>
+            <thead style="position: sticky; top: 0; background-color: var(--jp-layout-color0, var(--vscode-editor-background, white));">
+        <tr><th>Package</th><th>Version</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><strong>numpy</strong></td><td>1.26.4</td></tr>
+        <tr><td><strong>dask</strong></td><td>2024.11.2</td></tr>
+        <tr><td><strong>scanpy</strong></td><td>1.11.0rc2</td></tr>
+        <tr><td><strong>anndata</strong></td><td>0.11.0rc3</td></tr>
+        <tr><td><strong>h5py</strong></td><td>3.12.1</td></tr>
+        <tr><td><strong>pandas</strong></td><td>2.2.3</td></tr>
+        <tr><td><strong>tqdm</strong></td><td>4.67.1</td></tr>
+        <tr><td><strong>distributed</strong></td><td>2024.11.2</td></tr>
+    </tbody>
+    <thead style="position: sticky; top: 0; background-color: var(--jp-layout-color0, var(--vscode-editor-background, white));">
+        <tr><th>Component</th><th>Info</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Python</td><td>3.12.8 | packaged by conda-forge | (main, Dec  5 2024, 14:24:40) [GCC 13.3.0]</td></tr>
+        <tr><td>OS</td><td>Linux-5.14.0-427.37.1.el9_4.x86_64-x86_64-with-glibc2.34</td></tr>
+        <tr><td>CPU</td><td>128 logical CPU cores, x86_64</td></tr>
+        <tr><td>GPU</td><td>ID: 0, NVIDIA A100 80GB PCIe, Driver: 560.35.03, Memory: 81920 MiB</td></tr>
+        <tr><td>Updated</td><td>2025-03-05 16:10</td></tr>
+    </tbody>
+        </table>
+
+        <details>
+        <summary>Dependencies</summary>
+                <div style="max-height: min(500px, 80vh); overflow-y: auto;">
+    <table class=table>
+            <thead style="position: sticky; top: 0; background-color: var(--jp-layout-color0, var(--vscode-editor-background, white));">
+    <tr><th>Dependency</th><th>Version</th></tr>
+</thead>
+<tbody>
+    <tr><td>scikit-learn</td><td>1.5.1</td></tr>
+    <tr><td>scipy</td><td>1.14.1</td></tr>
+    <tr><td>zstandard</td><td>0.23.0</td></tr>
+    <tr><td>Pygments</td><td>2.19.1</td></tr>
+    <tr><td>sparse</td><td>0.15.5</td></tr>
+    <tr><td>prompt_toolkit</td><td>3.0.50</td></tr>
+    <tr><td>wcwidth</td><td>0.2.13</td></tr>
+    <tr><td>torch</td><td>2.6.0 (2.6.0+cu124)</td></tr>
+    <tr><td>setproctitle</td><td>1.3.5</td></tr>
+    <tr><td>typing_extensions</td><td>4.12.2</td></tr>
+    <tr><td>igraph</td><td>0.11.8</td></tr>
+    <tr><td>comm</td><td>0.2.2</td></tr>
+    <tr><td>crc32c</td><td>2.7.1</td></tr>
+    <tr><td>asciitree</td><td>0.3.3</td></tr>
+    <tr><td>louvain</td><td>0.8.2</td></tr>
+    <tr><td>ipykernel</td><td>6.29.5</td></tr>
+    <tr><td>zarr</td><td>2.18.3</td></tr>
+    <tr><td>asttokens</td><td>3.0.0</td></tr>
+    <tr><td>tblib</td><td>3.0.0</td></tr>
+    <tr><td>cycler</td><td>0.12.1</td></tr>
+    <tr><td>numba</td><td>0.60.0</td></tr>
+    <tr><td>numcodecs</td><td>0.15.1</td></tr>
+    <tr><td>msgpack</td><td>1.1.0</td></tr>
+    <tr><td>pyarrow</td><td>17.0.0</td></tr>
+    <tr><td>lz4</td><td>4.3.3</td></tr>
+    <tr><td>jedi</td><td>0.19.2</td></tr>
+    <tr><td>zict</td><td>3.0.0</td></tr>
+    <tr><td>toolz</td><td>1.0.0 (toolz: 1.0.0, tlz: 1.0.1)</td></tr>
+    <tr><td>jaraco.collections</td><td>5.1.0</td></tr>
+    <tr><td>jaraco.text</td><td>3.12.1</td></tr>
+    <tr><td>stack_data</td><td>0.6.3</td></tr>
+    <tr><td>rapids-dask-dependency</td><td>24.12.0a0</td></tr>
+    <tr><td>pickleshare</td><td>0.7.5</td></tr>
+    <tr><td>tornado</td><td>6.4.2</td></tr>
+    <tr><td>texttable</td><td>1.7.0</td></tr>
+    <tr><td>pytz</td><td>2024.1</td></tr>
+    <tr><td>pyparsing</td><td>3.2.1</td></tr>
+    <tr><td>joblib</td><td>1.4.2</td></tr>
+    <tr><td>jupyter_client</td><td>8.6.3</td></tr>
+    <tr><td>pynvml</td><td>11.4.1</td></tr>
+    <tr><td>omegaconf</td><td>2.3.0</td></tr>
+    <tr><td>leidenalg</td><td>0.10.2</td></tr>
+    <tr><td>cupy</td><td>13.3.0</td></tr>
+    <tr><td>cuda-python</td><td>12.6.0</td></tr>
+    <tr><td>traitlets</td><td>5.14.3</td></tr>
+    <tr><td>platformdirs</td><td>4.3.6</td></tr>
+    <tr><td>rmm</td><td>24.12.1 (24.12.01)</td></tr>
+    <tr><td>debugpy</td><td>1.8.12</td></tr>
+    <tr><td>psutil</td><td>6.1.1</td></tr>
+    <tr><td>more-itertools</td><td>10.6.0</td></tr>
+    <tr><td>natsort</td><td>8.4.0</td></tr>
+    <tr><td>legacy-api-wrap</td><td>1.4.1</td></tr>
+    <tr><td>pure_eval</td><td>0.2.3</td></tr>
+    <tr><td>Deprecated</td><td>1.2.18</td></tr>
+    <tr><td>threadpoolctl</td><td>3.5.0</td></tr>
+    <tr><td>pyzmq</td><td>26.2.1</td></tr>
+    <tr><td>executing</td><td>2.1.0</td></tr>
+    <tr><td>PyYAML</td><td>6.0.2</td></tr>
+    <tr><td>colorama</td><td>0.4.6</td></tr>
+    <tr><td>session-info2</td><td>0.1.2</td></tr>
+    <tr><td>llvmlite</td><td>0.43.0</td></tr>
+    <tr><td>parso</td><td>0.8.4</td></tr>
+    <tr><td>locket</td><td>1.0.0</td></tr>
+    <tr><td>packaging</td><td>24.2</td></tr>
+    <tr><td>fastrlock</td><td>0.8.3</td></tr>
+    <tr><td>wrapt</td><td>1.17.2</td></tr>
+    <tr><td>jupyter_core</td><td>5.7.2</td></tr>
+    <tr><td>jaraco.functools</td><td>4.0.1</td></tr>
+    <tr><td>sortedcontainers</td><td>2.4.0</td></tr>
+    <tr><td>setuptools</td><td>75.8.0</td></tr>
+    <tr><td>click</td><td>8.1.8</td></tr>
+    <tr><td>cytoolz</td><td>1.0.1</td></tr>
+    <tr><td>ipython</td><td>8.32.0</td></tr>
+    <tr><td>jaraco.context</td><td>5.3.0</td></tr>
+    <tr><td>Jinja2</td><td>3.1.5</td></tr>
+    <tr><td>cloudpickle</td><td>3.1.1</td></tr>
+    <tr><td>decorator</td><td>5.1.1</td></tr>
+    <tr><td>defusedxml</td><td>0.7.1</td></tr>
+    <tr><td>MarkupSafe</td><td>3.0.2</td></tr>
+    <tr><td>kiwisolver</td><td>1.4.8</td></tr>
+    <tr><td>pillow</td><td>11.1.0</td></tr>
+    <tr><td>six</td><td>1.17.0</td></tr>
+    <tr><td>matplotlib</td><td>3.10.0</td></tr>
+    <tr><td>python-dateutil</td><td>2.9.0.post0</td></tr>
+</tbody>
+    </table>
+</div>
+    </details>
+        <details>
+            <summary>Copyable Markdown</summary>
+            <pre>| Package     | Version   |
+| ----------- | --------- |
+| numpy       | 1.26.4    |
+| dask        | 2024.11.2 |
+| scanpy      | 1.11.0rc2 |
+| anndata     | 0.11.0rc3 |
+| h5py        | 3.12.1    |
+| pandas      | 2.2.3     |
+| tqdm        | 4.67.1    |
+| distributed | 2024.11.2 |
+
+| Dependency             | Version                          |
+| ---------------------- | -------------------------------- |
+| scikit-learn           | 1.5.1                            |
+| scipy                  | 1.14.1                           |
+| zstandard              | 0.23.0                           |
+| Pygments               | 2.19.1                           |
+| sparse                 | 0.15.5                           |
+| prompt_toolkit         | 3.0.50                           |
+| wcwidth                | 0.2.13                           |
+| torch                  | 2.6.0 (2.6.0+cu124)              |
+| setproctitle           | 1.3.5                            |
+| typing_extensions      | 4.12.2                           |
+| igraph                 | 0.11.8                           |
+| comm                   | 0.2.2                            |
+| crc32c                 | 2.7.1                            |
+| asciitree              | 0.3.3                            |
+| louvain                | 0.8.2                            |
+| ipykernel              | 6.29.5                           |
+| zarr                   | 2.18.3                           |
+| asttokens              | 3.0.0                            |
+| tblib                  | 3.0.0                            |
+| cycler                 | 0.12.1                           |
+| numba                  | 0.60.0                           |
+| numcodecs              | 0.15.1                           |
+| msgpack                | 1.1.0                            |
+| pyarrow                | 17.0.0                           |
+| lz4                    | 4.3.3                            |
+| jedi                   | 0.19.2                           |
+| zict                   | 3.0.0                            |
+| toolz                  | 1.0.0 (toolz: 1.0.0, tlz: 1.0.1) |
+| jaraco.collections     | 5.1.0                            |
+| jaraco.text            | 3.12.1                           |
+| stack_data             | 0.6.3                            |
+| rapids-dask-dependency | 24.12.0a0                        |
+| pickleshare            | 0.7.5                            |
+| tornado                | 6.4.2                            |
+| texttable              | 1.7.0                            |
+| pytz                   | 2024.1                           |
+| pyparsing              | 3.2.1                            |
+| joblib                 | 1.4.2                            |
+| jupyter_client         | 8.6.3                            |
+| pynvml                 | 11.4.1                           |
+| omegaconf              | 2.3.0                            |
+| leidenalg              | 0.10.2                           |
+| cupy                   | 13.3.0                           |
+| cuda-python            | 12.6.0                           |
+| traitlets              | 5.14.3                           |
+| platformdirs           | 4.3.6                            |
+| rmm                    | 24.12.1 (24.12.01)               |
+| debugpy                | 1.8.12                           |
+| psutil                 | 6.1.1                            |
+| more-itertools         | 10.6.0                           |
+| natsort                | 8.4.0                            |
+| legacy-api-wrap        | 1.4.1                            |
+| pure_eval              | 0.2.3                            |
+| Deprecated             | 1.2.18                           |
+| threadpoolctl          | 3.5.0                            |
+| pyzmq                  | 26.2.1                           |
+| executing              | 2.1.0                            |
+| PyYAML                 | 6.0.2                            |
+| colorama               | 0.4.6                            |
+| session-info2          | 0.1.2                            |
+| llvmlite               | 0.43.0                           |
+| parso                  | 0.8.4                            |
+| locket                 | 1.0.0                            |
+| packaging              | 24.2                             |
+| fastrlock              | 0.8.3                            |
+| wrapt                  | 1.17.2                           |
+| jupyter_core           | 5.7.2                            |
+| jaraco.functools       | 4.0.1                            |
+| sortedcontainers       | 2.4.0                            |
+| setuptools             | 75.8.0                           |
+| click                  | 8.1.8                            |
+| cytoolz                | 1.0.1                            |
+| ipython                | 8.32.0                           |
+| jaraco.context         | 5.3.0                            |
+| Jinja2                 | 3.1.5                            |
+| cloudpickle            | 3.1.1                            |
+| decorator              | 5.1.1                            |
+| defusedxml             | 0.7.1                            |
+| MarkupSafe             | 3.0.2                            |
+| kiwisolver             | 1.4.8                            |
+| pillow                 | 11.1.0                           |
+| six                    | 1.17.0                           |
+| matplotlib             | 3.10.0                           |
+| python-dateutil        | 2.9.0.post0                      |
+
+| Component | Info                                                                          |
+| --------- | ----------------------------------------------------------------------------- |
+| Python    | 3.12.8 | packaged by conda-forge | (main, Dec  5 2024, 14:24:40) [GCC 13.3.0] |
+| OS        | Linux-5.14.0-427.37.1.el9_4.x86_64-x86_64-with-glibc2.34                      |
+| CPU       | 128 logical CPU cores, x86_64                                                 |
+| GPU       | ID: 0, NVIDIA A100 80GB PCIe, Driver: 560.35.03, Memory: 81920 MiB            |
+| Updated   | 2025-03-05 16:10                                                              |</pre>
+        </details></div></div>
+</div>
+<section id="technical-notes">
+<h2>Technical Notes<a class="headerlink" href="#technical-notes" title="Link to this heading">#</a></h2>
+<p>To turn on one or the other of GPU or CPU, use the flag below. If you are using a GPU, configure the <code class="docutils literal notranslate"><span class="pre">gpus</span></code> flag accordingly to the number of GPUs you have available.  Similarly, for the CPU implementation, you can configure the number of workers.  We ran this notebook using CPU with a slurm configuration like <code class="docutils literal notranslate"><span class="pre">srun</span> <span class="pre">...</span> <span class="pre">-c</span> <span class="pre">32</span> <span class="pre">--mem=300gb</span></code>, using 16 dask workers and the below sparse chunks size while we were only able to get one GPU, although the beauty of <code class="docutils literal notranslate"><span class="pre">dask</span></code> is that one is enough to complete the analysis thanks to the out-of-core capabilities.  You can of course use fewer CPU cores and this notebook will still be runnable, such is the beauty of truly lazy, chunked computation.  Nothing is loaded into memory until it is needed, and only the amount needed to perform the local computation on a chunk of the data.</p>
+<p>The interplay between memory and workers is delicate - too many workers and not enough memory will cause your calculation to crash, so often it is good to have a few fewer workers than you think would be best.  For example, because a single GPU has somewhere in the range of 32GB, that is more than the individual 16 workers can have who split the 300GB, thereby allowing for a larger chunk size.  Furthermore with <a class="reference external" href="https://github.com/rapidsai/rmm">rapids-memory-management</a>, memory concerns are not so overriding on the GPU.</p>
+<p><strong>Caution</strong>: Out-of-core support is still quite new in both packages, so we are learning more and more daily about performance optimizations. The information here about performance thus represents our best attempt to provide advice on performance. On only one GPU, preprocessing can be quite lengthy, and therefore it is advisable to use rapids only with more than one GPU (be sure to update the <code class="docutils literal notranslate"><span class="pre">gpus</span></code> variable accordingly to reflect this - it should be something like <code class="docutils literal notranslate"><span class="pre">'0,1,2,3'</span></code>, for example, for four GPUs).  Otherwise, we have observed that the single-GPU PCA is faster than the multi-core PCA (~12.5 min vs. ~18 min), but the time needed to bring the data back to the CPU from the GPU for writing causes the two to be comparable i.e., PCA + writing the results has the same time between one GPU and multi-core CPU with the above specs.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">use_gpu</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rapids_singlecell</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">rsc</span>
+    <span class="n">SPARSE_CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1_000_000</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">dask_cuda</span><span class="w"> </span><span class="kn">import</span> <span class="n">LocalCUDACluster</span>
+
+    <span class="kn">import</span><span class="w"> </span><span class="nn">rmm</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">cupyx.scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">spx</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rmm.allocators.cupy</span><span class="w"> </span><span class="kn">import</span> <span class="n">rmm_cupy_allocator</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_mem</span><span class="p">():</span>
+        <span class="n">rmm</span><span class="o">.</span><span class="n">reinitialize</span><span class="p">(</span><span class="n">managed_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">cp</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">set_allocator</span><span class="p">(</span><span class="n">rmm_cupy_allocator</span><span class="p">)</span>
+    <span class="n">gpus</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span> <span class="c1"># comma separated like &quot;0,1,2&quot; for 3 gpus</span>
+    <span class="n">cluster</span> <span class="o">=</span> <span class="n">LocalCUDACluster</span><span class="p">(</span><span class="n">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="n">gpus</span><span class="p">)</span>
+    <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">register_chunk_type</span><span class="p">(</span><span class="n">spx</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+
+    <span class="n">SPARSE_CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">100_000</span>
+    <span class="n">cluster</span> <span class="o">=</span> <span class="n">LocalCluster</span><span class="p">(</span><span class="n">n_workers</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">set_mem</span><span class="p">)</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">rsc</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">sc</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">client</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+    <div style="width: 24px; height: 24px; background-color: #e1e1e1; border: 3px solid #9D9D9D; border-radius: 5px; position: absolute;"> </div>
+    <div style="margin-left: 48px;">
+        <h3 style="margin-bottom: 0px;">Client</h3>
+        <p style="color: #9D9D9D; margin-bottom: 0px;">Client-7912c966-f9dc-11ef-a6b7-00001049fe80</p>
+        <table style="width: 100%; text-align: left;">
+
+        <tr>
+        
+            <td style="text-align: left;"><strong>Connection method:</strong> Cluster object</td>
+            <td style="text-align: left;"><strong>Cluster type:</strong> distributed.LocalCluster</td>
+        
+        </tr>
+
+        
+            <tr>
+                <td style="text-align: left;">
+                    <strong>Dashboard: </strong> <a href="http://127.0.0.1:8787/status" target="_blank">http://127.0.0.1:8787/status</a>
+                </td>
+                <td style="text-align: left;"></td>
+            </tr>
+        
+
+        </table>
+
+        
+
+        
+            <details>
+            <summary style="margin-bottom: 20px;"><h3 style="display: inline;">Cluster Info</h3></summary>
+            <div class="jp-RenderedHTMLCommon jp-RenderedHTML jp-mod-trusted jp-OutputArea-output">
+    <div style="width: 24px; height: 24px; background-color: #e1e1e1; border: 3px solid #9D9D9D; border-radius: 5px; position: absolute;">
+    </div>
+    <div style="margin-left: 48px;">
+        <h3 style="margin-bottom: 0px; margin-top: 0px;">LocalCluster</h3>
+        <p style="color: #9D9D9D; margin-bottom: 0px;">3e2f9434</p>
+        <table style="width: 100%; text-align: left;">
+            <tr>
+                <td style="text-align: left;">
+                    <strong>Dashboard:</strong> <a href="http://127.0.0.1:8787/status" target="_blank">http://127.0.0.1:8787/status</a>
+                </td>
+                <td style="text-align: left;">
+                    <strong>Workers:</strong> 16
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: left;">
+                    <strong>Total threads:</strong> 16
+                </td>
+                <td style="text-align: left;">
+                    <strong>Total memory:</strong> 240.00 GiB
+                </td>
+            </tr>
+            
+            <tr>
+    <td style="text-align: left;"><strong>Status:</strong> running</td>
+    <td style="text-align: left;"><strong>Using processes:</strong> True</td>
+</tr>
+
+            
+        </table>
+
+        <details>
+            <summary style="margin-bottom: 20px;">
+                <h3 style="display: inline;">Scheduler Info</h3>
+            </summary>
+
+            <div style="">
+    <div>
+        <div style="width: 24px; height: 24px; background-color: #FFF7E5; border: 3px solid #FF6132; border-radius: 5px; position: absolute;"> </div>
+        <div style="margin-left: 48px;">
+            <h3 style="margin-bottom: 0px;">Scheduler</h3>
+            <p style="color: #9D9D9D; margin-bottom: 0px;">Scheduler-dcc86f43-8418-4c2b-bec4-f820e7038b52</p>
+            <table style="width: 100%; text-align: left;">
+                <tr>
+                    <td style="text-align: left;">
+                        <strong>Comm:</strong> tcp://127.0.0.1:8477
+                    </td>
+                    <td style="text-align: left;">
+                        <strong>Workers:</strong> 16
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left;">
+                        <strong>Dashboard:</strong> <a href="http://127.0.0.1:8787/status" target="_blank">http://127.0.0.1:8787/status</a>
+                    </td>
+                    <td style="text-align: left;">
+                        <strong>Total threads:</strong> 16
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: left;">
+                        <strong>Started:</strong> Just now
+                    </td>
+                    <td style="text-align: left;">
+                        <strong>Total memory:</strong> 240.00 GiB
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <details style="margin-left: 48px;">
+        <summary style="margin-bottom: 20px;">
+            <h3 style="display: inline;">Workers</h3>
+        </summary>
+
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 0</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8483
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8265/status" target="_blank">http://127.0.0.1:8265/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8285
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-ft3iwcso
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 1</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8101
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8487/status" target="_blank">http://127.0.0.1:8487/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8481
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-2hvdphk9
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 2</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8363
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8061/status" target="_blank">http://127.0.0.1:8061/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8233
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-k0dybc4h
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 3</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8155
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8485/status" target="_blank">http://127.0.0.1:8485/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8499
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-gn_0piah
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 4</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8259
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8215/status" target="_blank">http://127.0.0.1:8215/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8025
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-dwdoyzsm
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 5</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8081
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8497/status" target="_blank">http://127.0.0.1:8497/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8059
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-uqt168qj
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 6</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8301
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8231/status" target="_blank">http://127.0.0.1:8231/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8255
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-ldeqv_q_
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 7</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8121
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8293/status" target="_blank">http://127.0.0.1:8293/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8185
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-5kv9x6bx
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 8</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8235
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8055/status" target="_blank">http://127.0.0.1:8055/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8109
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-3zbts9vu
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 9</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8191
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8267/status" target="_blank">http://127.0.0.1:8267/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8373
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-jx4zbf7k
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 10</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8375
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8445/status" target="_blank">http://127.0.0.1:8445/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8237
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-u5oh644i
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 11</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8189
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8069/status" target="_blank">http://127.0.0.1:8069/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8261
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-rxe7zfzv
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 12</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8361
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8129/status" target="_blank">http://127.0.0.1:8129/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8309
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-gc99zj5u
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 13</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8461
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8357/status" target="_blank">http://127.0.0.1:8357/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8219
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-w8q0t2gp
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 14</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8433
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8263/status" target="_blank">http://127.0.0.1:8263/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8257
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-1la7lk5m
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="width: 24px; height: 24px; background-color: #DBF5FF; border: 3px solid #4CC9FF; border-radius: 5px; position: absolute;"> </div>
+            <div style="margin-left: 48px;">
+            <details>
+                <summary>
+                    <h4 style="margin-bottom: 0px; display: inline;">Worker: 15</h4>
+                </summary>
+                <table style="width: 100%; text-align: left;">
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Comm: </strong> tcp://127.0.0.1:8243
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Total threads: </strong> 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Dashboard: </strong> <a href="http://127.0.0.1:8307/status" target="_blank">http://127.0.0.1:8307/status</a>
+                        </td>
+                        <td style="text-align: left;">
+                            <strong>Memory: </strong> 15.00 GiB
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: left;">
+                            <strong>Nanny: </strong> tcp://127.0.0.1:8067
+                        </td>
+                        <td style="text-align: left;"></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" style="text-align: left;">
+                            <strong>Local directory: </strong> /tmp/dask-scratch-space/worker-k9rna9hc
+                        </td>
+                    </tr>
+
+                    
+
+                    
+
+                </table>
+            </details>
+            </div>
+        </div>
+        
+
+    </details>
+</div>
+
+        </details>
+    </div>
+</div>
+            </details>
+        
+
+    </div>
+</div></div></div>
+</div>
+</section>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">#</a></h2>
+<p>First, let’s do some standard preprocessing on the datasets.  Note that we use <code class="docutils literal notranslate"><span class="pre">ad.experimental.read_elem_as_dask</span></code> to load the big data, the cell x gene matrix, lazily.  The preprocessing is then done lazily i.e., normalization, log1p, and highly variable gene selection.  Individually, we’ll do this and then merge all the datasets into one large dataset to be used in the next step. We’ll finally merge the data into one large <code class="docutils literal notranslate"><span class="pre">AnnData</span></code> for the PCA.  Writing this out and then reading it back in is faster than rechunking a virtually concatenated i.e., <code class="docutils literal notranslate"><span class="pre">anndata.concat</span></code> dataset (<code class="docutils literal notranslate"><span class="pre">dask</span></code> requires uniform chunks, which would not be possible without rechunking).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">adatas</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_highly_variable_genes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">)):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">PATH</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/weixu.wang/100m/plate</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">_filtered.h5ad&quot;</span>
+
+    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">PATH</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span>
+            <span class="n">obs</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_elem</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;obs&quot;</span><span class="p">]),</span>
+            <span class="n">var</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_elem</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]),</span>
+        <span class="p">)</span>
+        <span class="n">adata</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">read_elem_as_dask</span><span class="p">(</span>
+            <span class="n">f</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">],</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="n">SPARSE_CHUNK_SIZE</span><span class="p">,</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+        <span class="n">rsc</span><span class="o">.</span><span class="n">get</span><span class="o">.</span><span class="n">anndata_to_GPU</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+    <span class="c1"># 100m filtering</span>
+    <span class="n">pass_filter_mask</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="s2">&quot;pass_filter&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;full&quot;</span>
+    <span class="n">adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">pass_filter_mask</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+
+    <span class="n">highly_variable_genes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">var_names</span><span class="p">[</span><span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s2">&quot;highly_variable&quot;</span><span class="p">]])</span>
+    <span class="n">all_highly_variable_genes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">highly_variable_genes</span><span class="p">)</span>
+    <span class="n">adatas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+
+<span class="c1">## select the genes appears more than two plates</span>
+<span class="n">gene_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">gene</span> <span class="k">for</span> <span class="n">genes</span> <span class="ow">in</span> <span class="n">all_highly_variable_genes</span> <span class="k">for</span> <span class="n">gene</span> <span class="ow">in</span> <span class="n">genes</span><span class="p">)</span>
+<span class="n">selected_genes</span> <span class="o">=</span> <span class="p">{</span><span class="n">gene</span> <span class="k">for</span> <span class="n">gene</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">gene_counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">)):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">common_genes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">var_names</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">selected_genes</span><span class="p">)</span>
+    <span class="n">adata</span> <span class="o">=</span> <span class="n">adatas</span><span class="p">[</span><span class="n">i</span><span class="p">][:,</span> <span class="n">common_genes</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">output_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/ilan.gold/100m/plate</span><span class="si">{</span><span class="nb">id</span><span class="si">}</span><span class="s2">_filtered_preprocessed_</span><span class="si">{</span><span class="s1">&#39;gpu&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;cpu&#39;</span><span class="si">}</span><span class="s2">.h5ad&quot;</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">write_h5ad</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="merge-all-data-into-giant-file">
+<h2>Merge all data into giant file<a class="headerlink" href="#merge-all-data-into-giant-file" title="Link to this heading">#</a></h2>
+<p>We’ll now merge the data into one large file for the PCA.  This is faster than rechunking a virtually concatenated i.e., <code class="docutils literal notranslate"><span class="pre">anndata.concat</span></code> dataset (<code class="docutils literal notranslate"><span class="pre">dask</span></code> requires uniform chunks, which would not be possible without rechunking).  Furthermore, rechunking can cause a memory blow-up.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">data_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">14</span><span class="p">):</span>
+    <span class="n">data_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="sa">f</span><span class="s2">&quot;plate_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/ilan.gold/100m/plate</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">_filtered_preprocessed_</span><span class="si">{</span><span class="s1">&#39;gpu&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;cpu&#39;</span><span class="si">}</span><span class="s2">.h5ad&quot;</span><span class="p">})</span>
+<span class="n">ad</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">concat_on_disk</span><span class="p">(</span>
+    <span class="n">data_dict</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s1">&#39;/lustre/groups/ml01/workspace/ilan.gold/100m/plate_merged_</span><span class="si">{</span><span class="s2">&quot;gpu&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;cpu&quot;</span><span class="si">}</span><span class="s1">.h5ad&#39;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;plate&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="calculate-cell-embeddings">
+<h2>Calculate cell embeddings<a class="headerlink" href="#calculate-cell-embeddings" title="Link to this heading">#</a></h2>
+<p>To do this we will use PCA.  Both <code class="docutils literal notranslate"><span class="pre">scanpy</span></code> and <code class="docutils literal notranslate"><span class="pre">rapids_singlecell</span></code> provide out-of-core implementations of PCA on sparse datasets.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/ilan.gold/100m/plate_merged_</span><span class="si">{</span><span class="s1">&#39;gpu&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;cpu&#39;</span><span class="si">}</span><span class="s2">.h5ad&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">adata</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span>
+        <span class="n">obs</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_elem</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;obs&quot;</span><span class="p">]),</span>
+        <span class="n">var</span><span class="o">=</span><span class="n">ad</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">read_elem</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="s2">&quot;var&quot;</span><span class="p">]),</span>
+    <span class="p">)</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">read_elem_as_dask</span><span class="p">(</span>
+        <span class="n">f</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">],</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="n">SPARSE_CHUNK_SIZE</span><span class="p">,</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2min 13s, sys: 59.2 s, total: 3min 12s
+Wall time: 3min 40s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">adata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AnnData object with n_obs × n_vars = 95624334 × 2304
+    obs: &#39;sample&#39;, &#39;species&#39;, &#39;gene_count&#39;, &#39;tscp_count&#39;, &#39;mread_count&#39;, &#39;bc1_wind&#39;, &#39;bc2_wind&#39;, &#39;bc3_wind&#39;, &#39;bc1_well&#39;, &#39;bc2_well&#39;, &#39;bc3_well&#39;, &#39;id&#39;, &#39;drugname_drugconc&#39;, &#39;drug&#39;, &#39;INT_ID&#39;, &#39;NUM.SNPS&#39;, &#39;NUM.READS&#39;, &#39;demuxlet_call&#39;, &#39;BEST.GUESS&#39;, &#39;BEST.LLK&#39;, &#39;NEXT.GUESS&#39;, &#39;NEXT.LLK&#39;, &#39;DIFF.LLK.BEST.NEXT&#39;, &#39;BEST.POSTERIOR&#39;, &#39;SNG.POSTERIOR&#39;, &#39;cell_line&#39;, &#39;SNG.BEST.LLK&#39;, &#39;SNG.NEXT.GUESS&#39;, &#39;SNG.NEXT.LLK&#39;, &#39;SNG.ONLY.POSTERIOR&#39;, &#39;DBL.BEST.GUESS&#39;, &#39;DBL.BEST.LLK&#39;, &#39;DIFF.LLK.SNG.DBL&#39;, &#39;sublibrary&#39;, &#39;BARCODE&#39;, &#39;pcnt_mito&#39;, &#39;S_score&#39;, &#39;G2M_score&#39;, &#39;phase&#39;, &#39;cell_line_orig&#39;, &#39;pass_filter&#39;, &#39;cell_name&#39;, &#39;plate&#39;
+    obsm: &#39;X_pca&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="n">rsc</span><span class="o">.</span><span class="n">get</span><span class="o">.</span><span class="n">anndata_to_GPU</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 3 μs, sys: 1e+03 ns, total: 4 μs
+Wall time: 29.3 μs
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">adata</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">mask_var</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="n">meta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="p">)</span> <span class="c1"># bring back to CPU</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 4min, sys: 26.1 s, total: 4min 26s
+Wall time: 17min 11s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_zarr</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/ilan.gold/100m/plate_merged_pca_</span><span class="si">{</span><span class="s1">&#39;gpu&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;cpu&#39;</span><span class="si">}</span><span class="s2">.zarr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2min 48s, sys: 19.3 s, total: 3min 7s
+Wall time: 15min 14s
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now the data can be read back in with <code class="docutils literal notranslate"><span class="pre">dask</span></code> if needed and put into the <code class="docutils literal notranslate"><span class="pre">anndata</span></code> object.  A slight more complex way to write the data, but perhaps more <code class="docutils literal notranslate"><span class="pre">anndata</span></code>-ic would have been to use <code class="docutils literal notranslate"><span class="pre">write_elem</span></code>: <a class="reference external" href="https://anndata.readthedocs.io/en/latest/generated/anndata.io.write_elem.html">https://anndata.readthedocs.io/en/latest/generated/anndata.io.write_elem.html</a></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dask</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;/lustre/groups/ml01/workspace/ilan.gold/100m/plate_merged_pca_</span><span class="si">{</span><span class="s1">&#39;gpu&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">use_gpu</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;cpu&#39;</span><span class="si">}</span><span class="s2">.zarr&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 196 ms, sys: 70.1 ms, total: 266 ms
+Wall time: 1.23 s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="visualization">
+<h2>Visualization<a class="headerlink" href="#visualization" title="Link to this heading">#</a></h2>
+<p>Briefly, we visualize a subset of the results to avoid meaningless overplotting.  However, the full PCA results are still available on disk and are ready for use downstream, whether in deep-learning applications or for simple linear classifiers.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">subset_adata</span> <span class="o">=</span> <span class="n">adata</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">adata</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="mi">1_000_000</span><span class="p">,))]</span>
+<span class="n">subset_adata</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 1.56 s, sys: 676 ms, total: 2.24 s
+Wall time: 3.35 s
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>View of AnnData object with n_obs × n_vars = 1000000 × 2304
+    obs: &#39;sample&#39;, &#39;species&#39;, &#39;gene_count&#39;, &#39;tscp_count&#39;, &#39;mread_count&#39;, &#39;bc1_wind&#39;, &#39;bc2_wind&#39;, &#39;bc3_wind&#39;, &#39;bc1_well&#39;, &#39;bc2_well&#39;, &#39;bc3_well&#39;, &#39;id&#39;, &#39;drugname_drugconc&#39;, &#39;drug&#39;, &#39;INT_ID&#39;, &#39;NUM.SNPS&#39;, &#39;NUM.READS&#39;, &#39;demuxlet_call&#39;, &#39;BEST.GUESS&#39;, &#39;BEST.LLK&#39;, &#39;NEXT.GUESS&#39;, &#39;NEXT.LLK&#39;, &#39;DIFF.LLK.BEST.NEXT&#39;, &#39;BEST.POSTERIOR&#39;, &#39;SNG.POSTERIOR&#39;, &#39;cell_line&#39;, &#39;SNG.BEST.LLK&#39;, &#39;SNG.NEXT.GUESS&#39;, &#39;SNG.NEXT.LLK&#39;, &#39;SNG.ONLY.POSTERIOR&#39;, &#39;DBL.BEST.GUESS&#39;, &#39;DBL.BEST.LLK&#39;, &#39;DIFF.LLK.SNG.DBL&#39;, &#39;sublibrary&#39;, &#39;BARCODE&#39;, &#39;pcnt_mito&#39;, &#39;S_score&#39;, &#39;G2M_score&#39;, &#39;phase&#39;, &#39;cell_line_orig&#39;, &#39;pass_filter&#39;, &#39;cell_name&#39;, &#39;plate&#39;
+    obsm: &#39;X_pca&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">map_blocks</span><span class="p">(</span>
+        <span class="n">spx</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">,</span> <span class="n">spx</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span>
+    <span class="p">)</span> <span class="c1"># bring back to GPU</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span> 
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/ictstr01/home/icb/ilan.gold/test_ken/venv/lib64/python3.12/site-packages/anndata/_core/index.py:173: PerformanceWarning: Slicing with an out-of-order index is generating 1044 times more chunks
+  return a[subset_idx]
+/ictstr01/home/icb/ilan.gold/test_ken/venv/lib64/python3.12/site-packages/distributed/client.py:3357: UserWarning: Sending large graph of size 49.22 MiB.
+This may cause some slowdown.
+Consider scattering data ahead of time and using futures.
+  warnings.warn(
+&lt;timed exec&gt;:1: ImplicitModificationWarning: Setting element `.obsm[&#39;X_pca&#39;]` of view, initializing view as actual.
+/ictstr01/home/icb/ilan.gold/test_ken/venv/lib64/python3.12/site-packages/anndata/_core/anndata.py:1756: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates(&quot;obs&quot;)
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 9min 20s, sys: 35.3 s, total: 9min 56s
+Wall time: 10min 35s
+</pre></div>
+</div>
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/ictstr01/home/icb/ilan.gold/test_ken/venv/lib64/python3.12/site-packages/anndata/_core/anndata.py:1756: UserWarning: Observation names are not unique. To make them unique, call `.obs_names_make_unique`.
+  utils.warn_names_duplicates(&quot;obs&quot;)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">subset_adata</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/ictstr01/home/icb/ilan.gold/test_ken/venv/lib64/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html
+  from .autonotebook import tqdm as notebook_tqdm
+</pre></div>
+</div>
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 10min 5s, sys: 24.9 s, total: 10min 30s
+Wall time: 9min 40s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">mod</span><span class="o">.</span><span class="n">tl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span><span class="n">subset_adata</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">use_gpu</span><span class="p">:</span>
+    <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_umap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subset_adata</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s2">&quot;X_umap&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 2h 35min 37s, sys: 25.3 s, total: 2h 36min 3s
+Wall time: 23min 32s
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%%time</span>
+<span class="n">sc</span><span class="o">.</span><span class="n">pl</span><span class="o">.</span><span class="n">umap</span><span class="p">(</span>
+    <span class="n">subset_adata</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cell_line&quot;</span><span class="p">,</span> <span class="s2">&quot;plate&quot;</span><span class="p">],</span>
+    <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/f4f0babddd830adfcd5a28f0c07000700f7254c2b988d9c22995a4417abab3e8.png" src="_images/f4f0babddd830adfcd5a28f0c07000700f7254c2b988d9c22995a4417abab3e8.png" />
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CPU times: user 11 s, sys: 514 ms, total: 11.5 s
+Wall time: 14.7 s
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "conda-env-rapids_singlecell-py"
+        },
+        kernelOptions: {
+            name: "conda-env-rapids_singlecell-py",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'conda-env-rapids_singlecell-py'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Tahoe-100M single cell perturbation atlas data analysis</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#technical-notes">Technical Notes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#merge-all-data-into-giant-file">Merge all data into giant file</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#calculate-cell-embeddings">Calculate cell embeddings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualization">Visualization</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Weixu Wang, Ilan Gold
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
