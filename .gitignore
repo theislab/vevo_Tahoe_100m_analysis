@@ -134,7 +134,6 @@ dmypy.json
 *.h5ad
 *.RData
 *.loom
-*.pdf
 *.eps
 *.png
 *.jpg
@@ -150,7 +149,6 @@ dmypy.json
 *.gmx
 
 data/
-figures/
 
 # OS specifics
 **.DS_Store
